@@ -255,11 +255,14 @@ app.get("/checkout-url", async (req, res) => {
       throw new Error("Failed to parse payment response");
     }
 
-    // Get prepay_id
-    const prepay_id = "0047e2ea7677e83a1e1b943628e03940030001";
+    // Get prepay_id from the actual response
+    const prepay_id = parsedResponse.prepay_id;
     if (!prepay_id) {
+      logger.error("No prepay_id in response", { response: parsedResponse });
       throw new Error("No prepay_id in response");
     }
+
+    logger.info("Extracted prepay_id for checkout URL", { prepay_id });
 
     // Build checkout URL
     const checkoutParams = {
@@ -273,6 +276,7 @@ app.get("/checkout-url", async (req, res) => {
       language: "fr"
     };
 
+    logger.debug("Checkout URL parameters for signature", checkoutParams);
     const checkoutSign = generateSignature(checkoutParams);
     const queryString = new URLSearchParams({
       ...checkoutParams,
