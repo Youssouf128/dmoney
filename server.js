@@ -263,13 +263,21 @@ app.get("/checkout-url", async (req, res) => {
 
     // Parse and validate response
     const parsedResponse = parsePaymentResponse(order.data);
+    logger.debug("Parsed response:", { parsedResponse });
+    
     if (!parsedResponse) {
+      logger.error("Failed to parse payment response", { rawData: order.data });
       throw new Error("Failed to parse payment response");
     }
 
     // Get prepay_id from the actual API response (nested in biz_content)
+    logger.debug("Looking for prepay_id in:", { biz_content: parsedResponse.biz_content });
     const prepay_id = parsedResponse.biz_content?.prepay_id;
     if (!prepay_id) {
+      logger.error("No prepay_id found", { 
+        parsedResponse, 
+        biz_content: parsedResponse.biz_content 
+      });
       throw new Error("No prepay_id in response");
     }
 
@@ -304,9 +312,18 @@ app.get("/checkout-url", async (req, res) => {
     });
 
     const status = error.response?.status || 500;
+    const apiResponse = error.response?.data || null;
+    
+    // Log additional details for debugging
+    logger.error("Full error details:", {
+      hasResponse: !!error.response,
+      errorType: error.constructor.name,
+      apiResponse
+    });
+    
     res.status(status).json({
       error: error.message,
-      apiResponse: error.response?.data || null
+      apiResponse: apiResponse
     });
   }
 });
