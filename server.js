@@ -210,7 +210,7 @@ app.get("/checkout-url", async (req, res) => {
       business_type: "BuyGoods",
       merch_code: MERCH_CODE,
       merch_order_id: orderId,
-      method: "payment_preorder",
+      method: "payment.preorder",
       nonce_str,
       notify_url: NOTIFY_URL,
       timeout_express: "120m",
