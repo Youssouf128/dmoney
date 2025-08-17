@@ -33,7 +33,7 @@ const logger = winston.createLogger({
   ]
 });
 
-// Private key is loaded lazily to avoid crashing in serverless environments
+// Private key is loaded lazily to avoid crashing in serverless environment
 function loadPrivateKey() {
   if (process.env.PRIVATE_KEY) {
     logger.debug('Private key loaded from environment variable PRIVATE_KEY');
