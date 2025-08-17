@@ -100,6 +100,8 @@ function generateSignature(params) {
       throw new Error('Private key not available for signing');
     }
 
+    logger.debug('About to generate signature with key length:', key.length);
+    
     const signature = crypto.sign('sha256', Buffer.from(rawString, 'utf-8'), {
       key,
       padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
@@ -107,9 +109,12 @@ function generateSignature(params) {
       mgf1Hash: 'sha256'
     });
 
-    return signature.toString('base64');
+    const base64Signature = signature.toString('base64');
+    logger.debug('Signature generated successfully, length:', base64Signature.length);
+    return base64Signature;
   } catch (error) {
     logger.error(`Error generating signature: ${error.message}`);
+    logger.error('Stack trace:', error.stack);
     throw error;
   }
 }
