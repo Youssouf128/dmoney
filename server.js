@@ -111,6 +111,7 @@ function generateSignature(params) {
 
     const base64Signature = signature.toString('base64');
     logger.debug('Signature generated successfully, length:', base64Signature.length);
+    logger.debug('Generated signature:', base64Signature);
     return base64Signature;
   } catch (error) {
     logger.error(`Error generating signature: ${error.message}`);
