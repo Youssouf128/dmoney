@@ -229,7 +229,7 @@ app.get("/checkout-url", async (req, res) => {
     const payload = {
       nonce_str,
       biz_content,
-      method: "payment_preorder",
+      method: "payment.preorder",
       version: "1.0",
       sign_type: "SHA256WithRSA",
       timestamp,
