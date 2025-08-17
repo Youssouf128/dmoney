@@ -17,7 +17,6 @@ const {
   MERCH_CODE,
   APPID,
   NOTIFY_URL,
-  PRIVATE_KEY_PATH,
   API_BASE
 } = process.env;
 
