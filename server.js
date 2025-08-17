@@ -198,7 +198,7 @@ app.get("/checkout-url", async (req, res) => {
       business_type: "BuyGoods",
       merch_code: MERCH_CODE,
       merch_order_id: orderId,
-      method: "payment_preorder",
+      method: "payment.preorder",
       nonce_str,
       notify_url: NOTIFY_URL,
       timeout_express: "120m",
@@ -217,7 +217,7 @@ app.get("/checkout-url", async (req, res) => {
     const payload = {
       nonce_str,
       biz_content,
-      method: "payment_preorder",
+      method: "payment.preorder",
       version: "1.0",
       sign_type: "SHA256WithRSA",
       timestamp,
@@ -327,7 +327,7 @@ app.get("/query-order/:orderId", async (req, res) => {
       appid: APPID,
       merch_code: MERCH_CODE,
       merch_order_id: orderId,
-      method: "payment_queryorder",
+      method: "payment.queryorder",
       nonce_str,
       timestamp,
       version: "1.0"
@@ -336,7 +336,7 @@ app.get("/query-order/:orderId", async (req, res) => {
     const sign = generateSignature(signParams);
     const payload = {
       nonce_str,
-      method: "payment_queryorder",
+      method: "payment.queryorder",
       version: "1.0",
       sign_type: "SHA256WithRSA",
       timestamp,
@@ -349,7 +349,7 @@ app.get("/query-order/:orderId", async (req, res) => {
     };
 
     const response = await axios.post(
-      `${API_BASE}/apiaccess/payment/v1/merchant/queryOrder`,
+      `${API_BASE}/apiaccess/payment/gateway/payment/v1/merchant/queryOrder`,
       payload,
       {
         headers: {
