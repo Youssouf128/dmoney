@@ -167,6 +167,8 @@ app.get("/auth", async (req, res) => {
 
 // Create order and generate payment URL
 app.get("/checkout-url", async (req, res) => {
+  let rawApiResponse = null; // Store raw API response for error handling
+  
   try {
     // Authenticate
     logger.info("Requesting authentication token for checkout");
@@ -240,26 +242,40 @@ app.get("/checkout-url", async (req, res) => {
     });
 
     // Send request to D-Money
-    const order = await axios.post(
-      `${API_BASE}/apiaccess/payment/gateway/payment/v1/merchant/preOrder`,
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "X-APP-KEY": APP_KEY,
-          "Content-Type": "application/json"
-        },
-        timeout: 30000,
-        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-        validateStatus: status => status < 500
-      }
-    );
+    let order;
+    try {
+      order = await axios.post(
+        `${API_BASE}/apiaccess/payment/gateway/payment/v1/merchant/preOrder`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-APP-KEY": APP_KEY,
+            "Content-Type": "application/json"
+          },
+          timeout: 30000,
+          httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+          validateStatus: status => status < 500
+        }
+      );
+    } catch (axiosError) {
+      logger.error("Axios request failed", {
+        message: axiosError.message,
+        status: axiosError.response?.status,
+        data: axiosError.response?.data,
+        stack: axiosError.stack
+      });
+      throw axiosError;
+    }
 
     logger.info("Payment response", {
       status: order.status,
       headers: order.headers,
       data: JSON.stringify(order.data, null, 2)
     });
+
+    // Store raw response for error handling
+    rawApiResponse = order.data;
 
     // Parse and validate response
     const parsedResponse = parsePaymentResponse(order.data);
@@ -312,13 +328,14 @@ app.get("/checkout-url", async (req, res) => {
     });
 
     const status = error.response?.status || 500;
-    const apiResponse = error.response?.data || null;
+    const apiResponse = error.response?.data || rawApiResponse || null;
     
     // Log additional details for debugging
     logger.error("Full error details:", {
       hasResponse: !!error.response,
       errorType: error.constructor.name,
-      apiResponse
+      apiResponse,
+      rawApiResponse
     });
     
     res.status(status).json({
