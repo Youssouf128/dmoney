@@ -382,6 +382,99 @@ app.get("/query-order/:orderId", async (req, res) => {
   }
 });
 
+// D-Money notification webhook endpoint
+app.post("/notify", async (req, res) => {
+  try {
+    const notification = req.body;
+    logger.info("Received D-Money notification", { 
+      data: JSON.stringify(notification, null, 2),
+      headers: JSON.stringify(req.headers, null, 2)
+    });
+
+    // Vérifier que la notification contient les champs requis
+    if (!notification || !notification.merch_order_id) {
+      logger.error("Invalid notification: missing required fields");
+      return res.status(400).json({ 
+        error: "Invalid notification format",
+        message: "Missing merch_order_id" 
+      });
+    }
+
+    // Extraire les informations importantes
+    const {
+      merch_order_id,
+      trade_status,
+      total_amount,
+      trans_currency,
+      payment_time,
+      transaction_id,
+      sign
+    } = notification;
+
+    logger.info("Payment notification details", {
+      orderId: merch_order_id,
+      status: trade_status,
+      amount: total_amount,
+      currency: trans_currency,
+      paymentTime: payment_time,
+      transactionId: transaction_id
+    });
+
+    // TODO: Vérifier la signature de la notification (recommandé pour la sécurité)
+    // Vous pouvez implémenter la vérification de signature ici si nécessaire
+
+    // Traitement selon le statut du paiement
+    switch(trade_status) {
+      case 'TRADE_SUCCESS':
+        logger.info(`✅ Payment successful for order ${merch_order_id}`);
+        // TODO: Marquer la commande comme payée dans votre base de données
+        // TODO: Envoyer confirmation à l'utilisateur
+        // TODO: Déclencher les actions post-paiement (livraison, etc.)
+        break;
+        
+      case 'TRADE_FINISHED':
+        logger.info(`✅ Payment finished for order ${merch_order_id}`);
+        // TODO: Finaliser la transaction
+        break;
+        
+      case 'TRADE_CLOSED':
+        logger.warn(`❌ Payment closed/cancelled for order ${merch_order_id}`);
+        // TODO: Marquer la commande comme annulée
+        break;
+        
+      case 'WAIT_BUYER_PAY':
+        logger.info(`⏳ Waiting for payment for order ${merch_order_id}`);
+        // TODO: Commande en attente de paiement
+        break;
+        
+      default:
+        logger.warn(`⚠️ Unknown payment status: ${trade_status} for order ${merch_order_id}`);
+    }
+
+    // Répondre avec succès pour confirmer la réception
+    // D-Money attend une réponse HTTP 200 pour marquer la notification comme reçue
+    res.status(200).json({ 
+      status: "success",
+      message: "Notification received and processed",
+      order_id: merch_order_id
+    });
+
+  } catch (error) {
+    logger.error("Error processing D-Money notification", {
+      message: error.message,
+      stack: error.stack,
+      body: JSON.stringify(req.body, null, 2)
+    });
+    
+    // Même en cas d'erreur, répondre 200 pour éviter que D-Money ne retente
+    // Vous pouvez changer cela selon vos besoins
+    res.status(200).json({ 
+      status: "error",
+      message: "Error processing notification but received"
+    });
+  }
+});
+
 // Webhook endpoint (placeholder)
 app.post("/webhooks/payment", async (req, res) => {
   try {
