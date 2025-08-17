@@ -204,8 +204,8 @@ app.get("/checkout-url", async (req, res) => {
       business_type: "BuyGoods"
     };
 
-    // Parameters for signature
-    const signParams = {
+    // ALL parameters for signature (matching Python implementation)
+    const allSignParams = {
       appid: APPID,
       business_type: "BuyGoods",
       merch_code: MERCH_CODE,
@@ -222,8 +222,9 @@ app.get("/checkout-url", async (req, res) => {
       version: "1.0"
     };
 
-    // Generate signature
-    const sign = generateSignature(signParams);
+    // Generate signature with ALL parameters
+    logger.debug("Parameters for signature:", allSignParams);
+    const sign = generateSignature(allSignParams);
 
     // Build request payload
     const payload = {
