@@ -72,15 +72,25 @@ function getTimestamp() {
 
 // Create raw request string for signature
 function createRawRequest(params) {
-  const sortedKeys = Object.keys(params).sort();
+  // Filter out excluded parameters and empty values
+  const excludedParams = new Set(['sign', 'sign_type', 'biz_content']);
+  const filteredParams = {};
+  
+  for (const [key, value] of Object.entries(params)) {
+    if (!excludedParams.has(key) && value !== null && value !== undefined && String(value).trim() !== '') {
+      filteredParams[key] = String(value);
+    }
+  }
+  
+  // Sort by key and create the raw string
+  const sortedKeys = Object.keys(filteredParams).sort();
   const raw = sortedKeys
-    .filter(key => !["sign", "sign_type", "biz_content"].includes(key))
-    .map(key => `${key}=${params[key]}`)
+    .map(key => `${key}=${filteredParams[key]}`)
     .join("&");
   return raw;
 }
 
-// Generate signature using RSA-PSS
+// Generate signature using RSA-PSS (matching Python implementation)
 function generateSignature(params) {
   try {
     const rawString = createRawRequest(params);
@@ -90,7 +100,7 @@ function generateSignature(params) {
       throw new Error('Private key not available for signing');
     }
 
-    const signature = crypto.sign('sha256', Buffer.from(rawString), {
+    const signature = crypto.sign('sha256', Buffer.from(rawString, 'utf-8'), {
       key,
       padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
       saltLength: 32,
@@ -225,13 +235,13 @@ app.get("/checkout-url", async (req, res) => {
     };
 
     logger.info("Sending payment request", {
-      url: `${API_BASE}/apiaccess/payment/gateway/payment/v1/merchant/preOrder`,
+      url: `${API_BASE}/payment/v1/merchant/preOrder`,
       payload: JSON.stringify(payload, null, 2)
     });
 
     // Send request to D-Money
     const order = await axios.post(
-      `${API_BASE}/apiaccess/payment/gateway/payment/v1/merchant/preOrder`,
+      `${API_BASE}/payment/v1/merchant/preOrder`,
       payload,
       {
         headers: {
