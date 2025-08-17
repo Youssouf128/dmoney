@@ -26,10 +26,10 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/dmoney:${{ github.sha }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/dmoney:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/dmoney:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/dmoney:buildcache,mode=max
+            abayazid/dmoney:${{ github.sha }}
+            abayazid/dmoney:latest
+          cache-from: type=registry,ref=abayazid/dmoney:buildcache
+          cache-to: type=registry,ref=abayazid/dmoney:buildcache,mode=max
 
   deploy:
     runs-on: ubuntu-latest
