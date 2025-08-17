@@ -208,7 +208,7 @@ app.get("/checkout-url", async (req, res) => {
       business_type: "BuyGoods",
       merch_code: MERCH_CODE,
       merch_order_id: orderId,
-      method: "payment.preorder",
+      method: "payment_preorder",
       nonce_str,
       notify_url: NOTIFY_URL,
       timeout_express: "120m",
@@ -227,7 +227,7 @@ app.get("/checkout-url", async (req, res) => {
     const payload = {
       nonce_str,
       biz_content,
-      method: "payment.preorder",
+      method: "payment_preorder",
       version: "1.0",
       sign_type: "SHA256WithRSA",
       timestamp,
