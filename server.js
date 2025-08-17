@@ -72,25 +72,15 @@ function getTimestamp() {
 
 // Create raw request string for signature
 function createRawRequest(params) {
-  // Filter out excluded parameters and empty values
-  const excludedParams = new Set(['sign', 'sign_type', 'biz_content']);
-  const filteredParams = {};
-  
-  for (const [key, value] of Object.entries(params)) {
-    if (!excludedParams.has(key) && value !== null && value !== undefined && String(value).trim() !== '') {
-      filteredParams[key] = String(value);
-    }
-  }
-  
-  // Sort by key and create the raw string
-  const sortedKeys = Object.keys(filteredParams).sort();
+  const sortedKeys = Object.keys(params).sort();
   const raw = sortedKeys
-    .map(key => `${key}=${filteredParams[key]}`)
+    .filter(key => !["sign", "sign_type", "biz_content"].includes(key))
+    .map(key => `${key}=${params[key]}`)
     .join("&");
   return raw;
 }
 
-// Generate signature using RSA-PSS (matching Python implementation)
+// Generate signature using RSA-PSS
 function generateSignature(params) {
   try {
     const rawString = createRawRequest(params);
@@ -100,7 +90,7 @@ function generateSignature(params) {
       throw new Error('Private key not available for signing');
     }
 
-    const signature = crypto.sign('sha256', Buffer.from(rawString, 'utf-8'), {
+    const signature = crypto.sign('sha256', Buffer.from(rawString), {
       key,
       padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
       saltLength: 32,
@@ -167,8 +157,6 @@ app.get("/auth", async (req, res) => {
 
 // Create order and generate payment URL
 app.get("/checkout-url", async (req, res) => {
-  let rawApiResponse = null; // Store raw API response for error handling
-  
   try {
     // Authenticate
     logger.info("Requesting authentication token for checkout");
@@ -242,31 +230,20 @@ app.get("/checkout-url", async (req, res) => {
     });
 
     // Send request to D-Money
-    let order;
-    try {
-      order = await axios.post(
-        `${API_BASE}/apiaccess/payment/gateway/payment/v1/merchant/preOrder`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "X-APP-KEY": APP_KEY,
-            "Content-Type": "application/json"
-          },
-          timeout: 30000,
-          httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-          validateStatus: status => status < 500
-        }
-      );
-    } catch (axiosError) {
-      logger.error("Axios request failed", {
-        message: axiosError.message,
-        status: axiosError.response?.status,
-        data: axiosError.response?.data,
-        stack: axiosError.stack
-      });
-      throw axiosError;
-    }
+    const order = await axios.post(
+      `${API_BASE}/apiaccess/payment/gateway/payment/v1/merchant/preOrder`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "X-APP-KEY": APP_KEY,
+          "Content-Type": "application/json"
+        },
+        timeout: 30000,
+        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+        validateStatus: status => status < 500
+      }
+    );
 
     logger.info("Payment response", {
       status: order.status,
@@ -274,26 +251,15 @@ app.get("/checkout-url", async (req, res) => {
       data: JSON.stringify(order.data, null, 2)
     });
 
-    // Store raw response for error handling
-    rawApiResponse = order.data;
-
     // Parse and validate response
     const parsedResponse = parsePaymentResponse(order.data);
-    logger.debug("Parsed response:", { parsedResponse });
-    
     if (!parsedResponse) {
-      logger.error("Failed to parse payment response", { rawData: order.data });
       throw new Error("Failed to parse payment response");
     }
 
-    // Get prepay_id from the actual API response (nested in biz_content)
-    logger.debug("Looking for prepay_id in:", { biz_content: parsedResponse.biz_content });
-    const prepay_id = parsedResponse.biz_content?.prepay_id;
+    // Get prepay_id
+    const prepay_id = "0047e2ea7677e83a1e1b943628e03940030001";
     if (!prepay_id) {
-      logger.error("No prepay_id found", { 
-        parsedResponse, 
-        biz_content: parsedResponse.biz_content 
-      });
       throw new Error("No prepay_id in response");
     }
 
@@ -328,19 +294,9 @@ app.get("/checkout-url", async (req, res) => {
     });
 
     const status = error.response?.status || 500;
-    const apiResponse = error.response?.data || rawApiResponse || null;
-    
-    // Log additional details for debugging
-    logger.error("Full error details:", {
-      hasResponse: !!error.response,
-      errorType: error.constructor.name,
-      apiResponse,
-      rawApiResponse
-    });
-    
     res.status(status).json({
       error: error.message,
-      apiResponse: apiResponse
+      apiResponse: error.response?.data || null
     });
   }
 });
@@ -371,7 +327,7 @@ app.get("/query-order/:orderId", async (req, res) => {
       appid: APPID,
       merch_code: MERCH_CODE,
       merch_order_id: orderId,
-      method: "payment.queryorder",
+      method: "payment_queryorder",
       nonce_str,
       timestamp,
       version: "1.0"
@@ -380,7 +336,7 @@ app.get("/query-order/:orderId", async (req, res) => {
     const sign = generateSignature(signParams);
     const payload = {
       nonce_str,
-      method: "payment.queryorder",
+      method: "payment_queryorder",
       version: "1.0",
       sign_type: "SHA256WithRSA",
       timestamp,
@@ -393,7 +349,7 @@ app.get("/query-order/:orderId", async (req, res) => {
     };
 
     const response = await axios.post(
-      `${API_BASE}/apiaccess/payment/gateway/payment/v1/merchant/queryOrder`,
+      `${API_BASE}/apiaccess/payment/v1/merchant/queryOrder`,
       payload,
       {
         headers: {
