@@ -104,9 +104,7 @@ function generateSignature(params) {
     
     const signature = crypto.sign('sha256', Buffer.from(rawString, 'utf-8'), {
       key,
-      padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-      saltLength: 32,
-      mgf1Hash: 'sha256'
+      padding: crypto.constants.RSA_PKCS1_PADDING
     });
 
     const base64Signature = signature.toString('base64');
