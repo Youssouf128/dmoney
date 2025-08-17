@@ -190,7 +190,7 @@ app.get("/checkout-url", async (req, res) => {
     const timestamp = getTimestamp();
     const orderId = `${timestamp}001`;
 
-    // Order information
+    // Order information (matching Python structure exactly)
     const biz_content = {
       trans_currency: "DJF",
       total_amount: "3000",
@@ -204,7 +204,7 @@ app.get("/checkout-url", async (req, res) => {
       business_type: "BuyGoods"
     };
 
-    // ALL parameters for signature (matching Python implementation)
+    // ALL parameters for signature (matching Python implementation exactly)
     const allSignParams = {
       appid: APPID,
       business_type: "BuyGoods",
@@ -225,6 +225,7 @@ app.get("/checkout-url", async (req, res) => {
     // Generate signature with ALL parameters
     logger.debug("Parameters for signature:", allSignParams);
     const sign = generateSignature(allSignParams);
+    logger.debug("Generated signature:", sign);
 
     // Build request payload
     const payload = {
