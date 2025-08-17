@@ -208,22 +208,25 @@ app.get("/checkout-url", async (req, res) => {
       business_type: "BuyGoods"
     };
 
-    // ALL parameters for signature (matching Python implementation exactly)
+    // Build signature parameters (flatten biz_content + root level params)
     const allSignParams = {
+      // Root level parameters
+      nonce_str,
+      method: "payment.preorder", 
+      version: "1.0",
+      sign_type: "SHA256WithRSA",
+      timestamp,
+      // Flattened biz_content parameters
       appid: APPID,
       business_type: "BuyGoods",
       merch_code: MERCH_CODE,
       merch_order_id: orderId,
-      method: "payment.preorder",
-      nonce_str,
       notify_url: NOTIFY_URL,
       timeout_express: "120m",
-      timestamp,
       title: "Commande test",
       total_amount: "3000",
       trade_type: "Checkout",
-      trans_currency: "DJF",
-      version: "1.0"
+      trans_currency: "DJF"
     };
 
     // Generate signature with ALL parameters
