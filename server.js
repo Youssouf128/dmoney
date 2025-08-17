@@ -257,8 +257,8 @@ app.get("/checkout-url", async (req, res) => {
       throw new Error("Failed to parse payment response");
     }
 
-    // Get prepay_id
-    const prepay_id = "0047e2ea7677e83a1e1b943628e03940030001";
+    // Get prepay_id from the actual API response
+    const prepay_id = parsedResponse.prepay_id;
     if (!prepay_id) {
       throw new Error("No prepay_id in response");
     }
