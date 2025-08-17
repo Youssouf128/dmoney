@@ -231,7 +231,7 @@ app.get("/checkout-url", async (req, res) => {
     // Generate signature with ALL parameters
     logger.debug("Parameters for signature:", allSignParams);
     const sign = generateSignature(allSignParams);
-    logger.debug("Generated signature:", sign);
+    logger.debug("Final generated signature for payload:", sign);
 
     // Build request payload
     const payload = {
