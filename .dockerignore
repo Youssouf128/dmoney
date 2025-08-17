@@ -1,0 +1,8 @@
+node_modules
+npm-debug.log
+Dockerfile
+docker-compose.yml
+*.md
+*.log
+private_key.pem
+public_key.pem

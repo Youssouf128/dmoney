@@ -1,0 +1,297 @@
+{
+	"info": {
+		"_postman_id": "5a6a07fc-d97a-4496-8483-ad2ffeb6c80a",
+		"name": "PGSHOP test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13500172",
+		"_collection_link": "https://crimson-spaceship-179422.postman.co/workspace/AMIN~12421152-f090-4210-ae68-3de8562e05fc/collection/13500172-5a6a07fc-d97a-4496-8483-ad2ffeb6c80a?action=share&source=collection_link&creator=13500172"
+	},
+	"item": [
+		{
+			"name": "01-generateToken",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-APP-KEY",
+						"value": "909290e0-f8d1-4151-a62e-a6b863447a79",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n     \"appSecret\": \"786cf6e6b4d6c74c30e2ed8ab27866f6\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://pgtest.d-money.dj:38443/apiaccess/payment/gateway/payment/v1/token",
+					"protocol": "https",
+					"host": [
+						"pgtest",
+						"d-money",
+						"dj"
+					],
+					"port": "38443",
+					"path": [
+						"apiaccess",
+						"payment",
+						"gateway",
+						"payment",
+						"v1",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "02-CreateOrder",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 3a1d07a7f4ad19e90ba12332fc7259f9",
+						"type": "text"
+					},
+					{
+						"key": "x-app-key",
+						"value": "909290e0-f8d1-4151-a62e-a6b863447a79",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nonce_str\": \"fcab0d2949e64a69a212aa83eab6eXXX\",\r\n    \"biz_content\": {\r\n        \"trans_currency\": \"DJF\",\r\n        \"total_amount\": \"3000\",\r\n        \"merch_order_id\": \"15435503637979\",\r\n        \"appid\": \"1298773049344000\",\r\n        \"merch_code\": \"9932\",\r\n        \"timeout_express\": \"120m\",\r\n        \"trade_type\": \"Checkout\",\r\n        \"notify_url\": \"https://payment.d-money.dj\",\r\n        \"title\": \"iPhone15\",\r\n        \"business_type\": \"BuyGoods\"\r\n    },\r\n    \"method\": \"payment.preorder\",\r\n    \"sign\": \"p2S2hIuF24FyYRq5mdNCCal2vVr9FKY9RVqkSnqGegiMgjNz8sw4LCYOb9rUXY7kDCAHR1L/60PskT7d9RmkYjb1EWRgbZZjU6YtE5tI1shr1NqA+JgcE/bD/0Wf3xwXpDR6oRpPcDyxU/ij25h9gtiWPzyaStzr25rrLt/W0lKyeDNY3SUg+vww/ETd9ScSfFOM6Alog/94jh+h8rhvbv7wnmkM64og7tzx6wqS7/1jqHPlvUjUbskuVy1VfJRcp9s5c/kaaSbNIwo6nXVVPe7fCdawAr8cgNl2vGUFW4lhoEV624IEIvAUZ1W0J5Ji1ZZ/+f9KMpWnqZCMClRZtc1Lry8iyBhtI+cxCyoTtswQJhM+p+jnS5wFdKHg5bQEiwMWEu+vM9UV567gUqS1ntKrIoOqCzbsnVquJ/7Rod8QJ2d/qIY3iR9Ru727HAs8nNnl6EhYjj7L6R4kWeLtkeZY2n4nYIzk+Jz4lyxvw4OvxTDViYqne4Ev+++KKL9I\",\r\n    \"version\": \"1.0\",\r\n    \"sign_type\": \"SHA256WithRSA\",\r\n    \"timestamp\": \"1724163267\"\r\n}\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://pgtest.d-money.dj:38443/apiaccess/payment/gateway/payment/v1/merchant/preOrder",
+					"protocol": "https",
+					"host": [
+						"pgtest",
+						"d-money",
+						"dj"
+					],
+					"port": "38443",
+					"path": [
+						"apiaccess",
+						"payment",
+						"gateway",
+						"payment",
+						"v1",
+						"merchant",
+						"preOrder"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "payment webpage",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://pg.d-moneyservice.dj:38443/payment/web/paygate?appid=1276820548070400&merch_code=2222&nonce_str=fcab0d2949e64a69a212aa83eab6ee1d&prepay_id=0507076487def06bd1b876eb02ae67df015002&timestamp={{$timestamp}}&sign=ApRInnBHiKAsIiRw/OjjwsVucObX/BORwnbUkOrFtV33X/rlZ7EYfq0PcLGlAS8c+HnQpgf+80Ek7gvFI4tmrrZ99NS+tQ9Xw5NAOcKF3nm2Fl4YZ9t+FWmYmswcp8AAcY9/yD1te5FpY6UGmJZzqM+mAH6Lvcyb+UyaXl+nhzLVuK3+MmiwLSQ+d0g1OEBuW3ibRLWIHaBaCla0bB4EGNlZMI0EAbWSQbbuu7qPCUvQGq13fJEc9ZJcxxPge7m2NyZQEPmap9lGxiMqftR9XozoYZlZOnsPKbaNUKCv/7bcakBbZH0MunKJxoIX7IkRBjqYntadnAUR/2APlpKQklk3BejnpIFMODMu14Oq8y1Z7UBGUgEiNUcdUVpBaE4mOKWCTVw0CD3dwX4zBX3kvy/bpDfq3wstVyFBIEqjU4SlHtHqjSKFYKylwR88frUyPN8nyehwqzhMrVewFjGWx2j7db9ssZnRWoM7p+N1weBXZvwQJfVBwsO2PpfS7JKL&sign_type=SHA256WithRSA&version=1.0&trade_type=Checkout&language=en",
+					"protocol": "https",
+					"host": [
+						"pg",
+						"d-moneyservice",
+						"dj"
+					],
+					"port": "38443",
+					"path": [
+						"payment",
+						"web",
+						"paygate"
+					],
+					"query": [
+						{
+							"key": "appid",
+							"value": "1276820548070400",
+							"description": "909290e0-f8d1-4151-a62e-a6b863447a79"
+						},
+						{
+							"key": "merch_code",
+							"value": "2222"
+						},
+						{
+							"key": "nonce_str",
+							"value": "fcab0d2949e64a69a212aa83eab6ee1d"
+						},
+						{
+							"key": "prepay_id",
+							"value": "0507076487def06bd1b876eb02ae67df015002"
+						},
+						{
+							"key": "timestamp",
+							"value": "{{$timestamp}}"
+						},
+						{
+							"key": "sign",
+							"value": "ApRInnBHiKAsIiRw/OjjwsVucObX/BORwnbUkOrFtV33X/rlZ7EYfq0PcLGlAS8c+HnQpgf+80Ek7gvFI4tmrrZ99NS+tQ9Xw5NAOcKF3nm2Fl4YZ9t+FWmYmswcp8AAcY9/yD1te5FpY6UGmJZzqM+mAH6Lvcyb+UyaXl+nhzLVuK3+MmiwLSQ+d0g1OEBuW3ibRLWIHaBaCla0bB4EGNlZMI0EAbWSQbbuu7qPCUvQGq13fJEc9ZJcxxPge7m2NyZQEPmap9lGxiMqftR9XozoYZlZOnsPKbaNUKCv/7bcakBbZH0MunKJxoIX7IkRBjqYntadnAUR/2APlpKQklk3BejnpIFMODMu14Oq8y1Z7UBGUgEiNUcdUVpBaE4mOKWCTVw0CD3dwX4zBX3kvy/bpDfq3wstVyFBIEqjU4SlHtHqjSKFYKylwR88frUyPN8nyehwqzhMrVewFjGWx2j7db9ssZnRWoM7p+N1weBXZvwQJfVBwsO2PpfS7JKL"
+						},
+						{
+							"key": "sign_type",
+							"value": "SHA256WithRSA"
+						},
+						{
+							"key": "version",
+							"value": "1.0"
+						},
+						{
+							"key": "trade_type",
+							"value": "Checkout"
+						},
+						{
+							"key": "language",
+							"value": "en"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "webcheckout url",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://pg.d-moneyservice.dj:38443/payment/web/paygate?appid=1293049431398401&merch_code=9988&nonce_str=12b923cc29e7445fb93a847af7d2520e&prepay_id=07253cc5e2b92909d268bcf4390c0697948002&timestamp=170789659&version=1.0&trade_type=Checkout&language=en&sign_type=SHA256WithRSA&sign=j7hzuvecytDynJbDAjLVqLF5wc/KKIPgqaXQ4WaooWbY6MGQsK6oh+kqWlZA5GVglpEhdro4lxuzJJlJ43/5UqipPOovnoSpSMUmY2/Ren1817hZSx2g8zQD8bw7ijmJV8t11JPNWQQ2Y0+H3LwHZOql+FQyuxZZ6FIzwpFCDB7KHj0Ui5KR5SdUMar9LIuMLRttIf/WgDcG/FQZZwUUG4XcQfaC7DOEtYjpRLfSi1C7eR847dCdmsDq5XPC/ygu5s6TvJl0Kt+R5JTnIRmpby1nQmXjhdDV22WwjcA3giOy/ioPV1UihPWhIVgQMujiHXqslcQEtJrdDfkAchGfiUI9FBJbKqvKhokGaXavzscKFZROMiqz8TE6slfx03W2V2Uq3s+Pydin0FeSjEL7/cwyaHpgHXIJDNs7YbeWix8ME+vFx+UZe5yWLiPx460qrPgVk+Pm3JCZiOGAWD4pf6+avIwsUtcTioUUyGGFZGCzauOWg0TMsNGTbsflFRoW",
+					"protocol": "https",
+					"host": [
+						"pg",
+						"d-moneyservice",
+						"dj"
+					],
+					"port": "38443",
+					"path": [
+						"payment",
+						"web",
+						"paygate"
+					],
+					"query": [
+						{
+							"key": "appid",
+							"value": "1293049431398401"
+						},
+						{
+							"key": "merch_code",
+							"value": "9988"
+						},
+						{
+							"key": "nonce_str",
+							"value": "12b923cc29e7445fb93a847af7d2520e"
+						},
+						{
+							"key": "prepay_id",
+							"value": "07253cc5e2b92909d268bcf4390c0697948002"
+						},
+						{
+							"key": "timestamp",
+							"value": "170789659"
+						},
+						{
+							"key": "version",
+							"value": "1.0"
+						},
+						{
+							"key": "trade_type",
+							"value": "Checkout"
+						},
+						{
+							"key": "language",
+							"value": "en"
+						},
+						{
+							"key": "sign_type",
+							"value": "SHA256WithRSA"
+						},
+						{
+							"key": "sign",
+							"value": "j7hzuvecytDynJbDAjLVqLF5wc/KKIPgqaXQ4WaooWbY6MGQsK6oh+kqWlZA5GVglpEhdro4lxuzJJlJ43/5UqipPOovnoSpSMUmY2/Ren1817hZSx2g8zQD8bw7ijmJV8t11JPNWQQ2Y0+H3LwHZOql+FQyuxZZ6FIzwpFCDB7KHj0Ui5KR5SdUMar9LIuMLRttIf/WgDcG/FQZZwUUG4XcQfaC7DOEtYjpRLfSi1C7eR847dCdmsDq5XPC/ygu5s6TvJl0Kt+R5JTnIRmpby1nQmXjhdDV22WwjcA3giOy/ioPV1UihPWhIVgQMujiHXqslcQEtJrdDfkAchGfiUI9FBJbKqvKhokGaXavzscKFZROMiqz8TE6slfx03W2V2Uq3s+Pydin0FeSjEL7/cwyaHpgHXIJDNs7YbeWix8ME+vFx+UZe5yWLiPx460qrPgVk+Pm3JCZiOGAWD4pf6+avIwsUtcTioUUyGGFZGCzauOWg0TMsNGTbsflFRoW"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "03-queryOrder",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 6f9ead8ca7df6b108a20547e354939c7",
+						"type": "text"
+					},
+					{
+						"key": "x-app-key",
+						"value": "909290e0-f8d1-4151-a62e-a6b863447a79",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"timestamp\": \"1535166225\",\r\n    \"nonce_str\": \"5K8264ILTKCH16CQ2502SI8ZNMTM67VS\",\r\n    \"method\": \"payment.queryorder\",\r\n    \"version\": \"1.0\",\r\n    \"biz_content\": {\r\n        \"appid\": \"1277381254425601\",\r\n        \"merch_code\": \"4444\",\r\n        \"merch_order_id\": \"15435503637438\"\r\n    },\r\n    \"sign\": \"McxnNoXbUWv5f6mlMYLLcwRrd/n+gLoVyPYhP+Xjz93vLQJurQYt5XKxAy3ZQu1ioOoor13Q/Q/A+qkrhJcvTttV7PEQ7bEoW1eQUjN6d/p+UAsAqYGZstTawbaFvzwQeiSX59LoKeax3x/3igUI7/i0sjCVWFau0DXKe6IGX7DGflWvQNKMfAq5CHbj+pkzJgyiE1BEef+kGkemtPG02RGgl57BQGi0yMlDAtYUoe1OkXRH7HSqU4FkikxpZq7yl05rIU6QPipJ9cb1B6DCMKzoZMtr23+3JgHcslQKTAd7tzu1xI+eekoP+sFasypz/gF54vj6jYrZiDDdTKo26OyAfEu0m7qP92e1QF0h3qShdAg+gn7nF7PpWFqOrowG2Bliopd9GTkSFIakgfmNScU8ZZrZ0L2Lwbokpko1JM79UUWa4jTfss/QFcglJ5pJq8tK+yLFJnuDWKaxP5KtdiHLIEOax6wFmtT4Bai+b6T1qmwIk7Upix/k/vC1kTzM\",\r\n    \"sign_type\": \"SHA256WithRSA\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://10.13.11.9:38443/apiaccess/payment/gateway/payment/v1/merchant/queryOrder",
+					"protocol": "https",
+					"host": [
+						"10",
+						"13",
+						"11",
+						"9"
+					],
+					"port": "38443",
+					"path": [
+						"apiaccess",
+						"payment",
+						"gateway",
+						"payment",
+						"v1",
+						"merchant",
+						"queryOrder"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
