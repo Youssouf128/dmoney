@@ -100,20 +100,16 @@ function generateSignature(params) {
       throw new Error('Private key not available for signing');
     }
 
-    logger.debug('About to generate signature with key length:', key.length);
-    
     const signature = crypto.sign('sha256', Buffer.from(rawString, 'utf-8'), {
       key,
-      padding: crypto.constants.RSA_PKCS1_PADDING
+      padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+      saltLength: 32,
+      mgf1Hash: 'sha256'
     });
 
-    const base64Signature = signature.toString('base64');
-    logger.debug('Signature generated successfully, length:', base64Signature.length);
-    logger.debug('Generated signature:', base64Signature);
-    return base64Signature;
+    return signature.toString('base64');
   } catch (error) {
     logger.error(`Error generating signature: ${error.message}`);
-    logger.error('Stack trace:', error.stack);
     throw error;
   }
 }
@@ -194,7 +190,7 @@ app.get("/checkout-url", async (req, res) => {
     const timestamp = getTimestamp();
     const orderId = `${timestamp}001`;
 
-    // Order information (matching Python structure exactly)
+    // Order information
     const biz_content = {
       trans_currency: "DJF",
       total_amount: "3000",
@@ -208,37 +204,32 @@ app.get("/checkout-url", async (req, res) => {
       business_type: "BuyGoods"
     };
 
-    // Build signature parameters (flatten biz_content + root level params)
-    const allSignParams = {
-      // Root level parameters
-      nonce_str,
-      method: "payment.preorder", 
-      version: "1.0",
-      sign_type: "SHA256WithRSA",
-      timestamp,
-      // Flattened biz_content parameters
+    // Parameters for signature
+    const signParams = {
       appid: APPID,
       business_type: "BuyGoods",
       merch_code: MERCH_CODE,
       merch_order_id: orderId,
+      method: "payment_preorder",
+      nonce_str,
       notify_url: NOTIFY_URL,
       timeout_express: "120m",
+      timestamp,
       title: "Commande test",
       total_amount: "3000",
       trade_type: "Checkout",
-      trans_currency: "DJF"
+      trans_currency: "DJF",
+      version: "1.0"
     };
 
-    // Generate signature with ALL parameters
-    logger.debug("Parameters for signature:", allSignParams);
-    const sign = generateSignature(allSignParams);
-    logger.debug("Final generated signature for payload:", sign);
+    // Generate signature
+    const sign = generateSignature(signParams);
 
     // Build request payload
     const payload = {
       nonce_str,
       biz_content,
-      method: "payment.preorder",
+      method: "payment_preorder",
       version: "1.0",
       sign_type: "SHA256WithRSA",
       timestamp,
