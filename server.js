@@ -39,7 +39,7 @@ function loadPrivateKey() {
     logger.debug('Private key loaded from environment variable PRIVATE_KEY');
     return process.env.PRIVATE_KEY;
   }
-  const p = process.env.PRIVATE_KEY_PATH || './private_key.pem';
+  const p = process.env.PRIVATE_KEY_PATH || './private_key_pkcs8.pem';
   try {
     const key = fs.readFileSync(p, 'utf8');
     logger.debug(`Private key loaded from ${p}`);
@@ -50,7 +50,7 @@ function loadPrivateKey() {
   }
 }
 
-logger.debug(`Private key load deferred; PRIVATE_KEY ${process.env.PRIVATE_KEY ? 'present' : 'absent'}, PRIVATE_KEY_PATH=${process.env.PRIVATE_KEY_PATH || './private_key.pem'}`);
+logger.debug(`Private key load deferred; PRIVATE_KEY ${process.env.PRIVATE_KEY ? 'present' : 'absent'}, PRIVATE_KEY_PATH=${process.env.PRIVATE_KEY_PATH || './private_key_pkcs8.pem'}`);
 
 // Initialize Express app
 const app = express();

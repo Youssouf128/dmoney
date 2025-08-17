@@ -228,3 +228,5 @@
 {"level":"debug","message":"Private key loaded from ./private_key.pem","timestamp":"2025-08-17T17:16:01.270Z"}
 {"level":"debug","message":"Private key load deferred; PRIVATE_KEY absent, PRIVATE_KEY_PATH=./private_key.pem","timestamp":"2025-08-17T17:43:50.276Z"}
 {"level":"info","message":"Server started on http://localhost:5000","timestamp":"2025-08-17T17:43:50.293Z"}
+{"level":"debug","message":"Private key load deferred; PRIVATE_KEY present, PRIVATE_KEY_PATH=./private_key.pem","timestamp":"2025-08-17T20:07:42.917Z"}
+{"level":"info","message":"Server started on http://0.0.0.0:9000","timestamp":"2025-08-17T20:07:42.954Z"}
