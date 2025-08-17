@@ -235,13 +235,13 @@ app.get("/checkout-url", async (req, res) => {
     };
 
     logger.info("Sending payment request", {
-      url: `${API_BASE}/payment/v1/merchant/preOrder`,
+      url: `${API_BASE}/apiaccess/payment/gateway/payment/v1/merchant/preOrder`,
       payload: JSON.stringify(payload, null, 2)
     });
 
     // Send request to D-Money
     const order = await axios.post(
-      `${API_BASE}/payment/v1/merchant/preOrder`,
+      `${API_BASE}/apiaccess/payment/gateway/payment/v1/merchant/preOrder`,
       payload,
       {
         headers: {
@@ -267,8 +267,8 @@ app.get("/checkout-url", async (req, res) => {
       throw new Error("Failed to parse payment response");
     }
 
-    // Get prepay_id from the actual API response
-    const prepay_id = parsedResponse.prepay_id;
+    // Get prepay_id from the actual API response (nested in biz_content)
+    const prepay_id = parsedResponse.biz_content?.prepay_id;
     if (!prepay_id) {
       throw new Error("No prepay_id in response");
     }
