@@ -402,9 +402,10 @@ const handler = serverless(app);
 if (require.main === module) {
   // Running locally
   const PORT = process.env.PORT || 9000;
-  app.listen(PORT, () => {
-    logger.info(`Server started on http://localhost:${PORT}`);
+  app.listen(PORT, '0.0.0.0', () => {
+    logger.info(`Server started on http://0.0.0.0:${PORT}`);
   });
+
 }
 
 // Export both app and handler so other entrypoints can choose
