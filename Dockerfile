@@ -1,4 +1,4 @@
-# See https://docs.docker.com/engine/reference/builder/
+# See https://docs.docker.com/engine/reference/builder
 FROM node:18-alpine
 WORKDIR /app
 COPY package*.json ./
